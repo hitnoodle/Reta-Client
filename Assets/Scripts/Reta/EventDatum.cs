@@ -2,6 +2,8 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
+using MiniJSON;
+
 namespace RetaClient
 {
 	/* Simple key value pair for holding parameter data */
@@ -29,6 +31,15 @@ namespace RetaClient
 		{
 			_Key = key;
 			_Value = value;
+		}
+
+		//JSON formatted string
+		public override string ToString ()
+		{
+			Dictionary<string, string> dict = new Dictionary<string, string>();
+			dict.Add(_Key, _Value);
+
+			return Json.Serialize(dict);
 		}
 	}
 	
@@ -65,10 +76,18 @@ namespace RetaClient
 			_Time = DateTime.Now;
 		}
 
-		//TODO: JSON formatted string
+		//JSON formatted string
 		public override string ToString()
 		{
-			return "EventDatum";
+			List<string> paramStrings = new List<string>();
+			foreach(Parameter param in _Parameters) paramStrings.Add(param.ToString());
+
+			Dictionary<string, object> dict = new Dictionary<string, object>();
+			dict.Add("Name",_Name);
+			dict.Add("Parameter", paramStrings);
+			dict.Add("Time", _Time.ToString()); //TODO: Check what time should be converted at
+
+			return Json.Serialize(dict);
 		}
 	}
 
@@ -106,10 +125,19 @@ namespace RetaClient
 			_Duration = endTime - _Time;
 		}
 
-		//TODO: JSON formatted string
+		//JSON formatted string
 		public override string ToString()
 		{
-			return "TimedEventDatum";
+			List<string> paramStrings = new List<string>();
+			foreach(Parameter param in _Parameters) paramStrings.Add(param.ToString());
+			
+			Dictionary<string, object> dict = new Dictionary<string, object>();
+			dict.Add("Name",_Name);
+			dict.Add("Parameter", paramStrings);
+			dict.Add("Time", _Time.ToString()); //TODO: Check what time should be converted at
+			dict.Add("Duration", _Duration);
+			
+			return Json.Serialize(dict);
 		}
 	}
 }

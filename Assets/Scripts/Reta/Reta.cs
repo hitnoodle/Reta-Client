@@ -92,13 +92,7 @@ namespace RetaClient
 
 		#endregion
 
-		#region Event Processing
-
-		protected void ProcessEvents()
-		{
-			ProcessEventData();
-			ProcessTimedEventData();
-		}
+		#region Protected Event Processing
 
 		protected void ProcessEventData()
 		{
@@ -150,6 +144,12 @@ namespace RetaClient
 		public void StartSession()
 		{
 			ProcessEvents();
+		}
+
+		public void ProcessEvents()
+		{
+			ProcessEventData();
+			ProcessTimedEventData();
 		}
 
 		public void Record(string eventName)
