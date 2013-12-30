@@ -56,7 +56,7 @@ namespace RetaClient
 
 		protected void EventSendingSucceed(string result)
 		{
-			_Connector.onSendingSucceed -= EventSendingFailed;
+			_Connector.onSendingSucceed -= EventSendingSucceed;
 			_Connector.onSendingFailed -= EventSendingFailed;
 
 			//Check whether result is OK
@@ -68,7 +68,7 @@ namespace RetaClient
 
 		protected void EventSendingFailed(string error)
 		{
-			_Connector.onSendingSucceed -= EventSendingFailed;
+			_Connector.onSendingSucceed -= EventSendingSucceed;
 			_Connector.onSendingFailed -= EventSendingFailed;
 		}
 
@@ -100,7 +100,7 @@ namespace RetaClient
 
 			if (datum != null)
 			{
-				_Connector.onSendingSucceed += EventSendingFailed;
+				_Connector.onSendingSucceed += EventSendingSucceed;
 				_Connector.onSendingFailed += EventSendingFailed;
 				
 				_Connector.SendData(datum.ToString());
