@@ -2,7 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Reta
+namespace RetaClient
 {
 	/* Simple key value pair for holding parameter data */
 	public class Parameter 
@@ -64,6 +64,12 @@ namespace Reta
 			_Parameters = parameters;
 			_Time = DateTime.Now;
 		}
+
+		//TODO: JSON formatted string
+		public override string ToString()
+		{
+			return "EventDatum";
+		}
 	}
 
 	/* Class for holding timed event datum */
@@ -98,6 +104,12 @@ namespace Reta
 		public void EndEvent(DateTime endTime)
 		{
 			_Duration = endTime - _Time;
+		}
+
+		//TODO: JSON formatted string
+		public override string ToString()
+		{
+			return "TimedEventDatum";
 		}
 	}
 }

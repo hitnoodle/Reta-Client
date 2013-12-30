@@ -3,11 +3,15 @@ using System.Collections;
 using System.Collections.Generic;
 
 /* Retention Analytics - Clients for Unity3D */
-namespace Reta 
+namespace RetaClient 
 {
-	/* Analytics main class */
+	/* Analytics main class 
+		TODO: Pause-resume support
+	 */
 	public class Reta 
 	{
+		public static bool DEBUG_ENABLED = false;
+
 		// Singleton for ease of access and managing resource
 		protected static Reta _Instance;
 		public static Reta Instance 
@@ -22,50 +26,142 @@ namespace Reta
 				
 				return _Instance; 
 			}
-		}
+		}		
 
-		//Configurations
-		protected string _Key;
-		protected string _ID;
-		protected string _AppVersion = "UNDEFINED";
-		protected bool _UsingSecureChannel = false;
+		//Object which represents the service
+		protected GameObject _GameObject;
 
 		//Components
 		protected Recorder _Recorder; 
+		protected Connector _Connector;
+
+		//Temp
+		TimedEventDatum _TempTimedEventDatum;
 		
 		//Hidden constructor
 		protected Reta() 
 		{
-			_ID = SystemInfo.deviceUniqueIdentifier;
+			_GameObject = new GameObject();
+			_GameObject.transform.position = Vector3.zero;
+			_GameObject.name = "_Reta";
+
+			//TODO: Check this shit, leak-prone
+			GameObject.DontDestroyOnLoad(_GameObject); 
 
 			_Recorder = new Recorder();
+			_Connector = _GameObject.AddComponent<Connector>();
 		}
+
+		#region Delegates
+
+		protected void EventSendingSucceed(string result)
+		{
+			_Connector.onSendingSucceed -= EventSendingFailed;
+			_Connector.onSendingFailed -= EventSendingFailed;
+
+			//Check whether result is OK
+			_Recorder.DequeueEvent();
+
+			//Go again
+			ProcessEventData();
+		}
+
+		protected void EventSendingFailed(string error)
+		{
+			_Connector.onSendingSucceed -= EventSendingFailed;
+			_Connector.onSendingFailed -= EventSendingFailed;
+		}
+
+		protected void TimedEventSendingSucceed(string result)
+		{
+			_Connector.onSendingSucceed -= TimedEventSendingSucceed;
+			_Connector.onSendingFailed -= TimedEventSendingFailed;
+
+			//Check whether result is OK
+			_Recorder.DeleteTimedEvent(_TempTimedEventDatum);
+			
+			//Go again
+			ProcessTimedEventData();
+		}
+
+		protected void TimedEventSendingFailed(string error)
+		{
+			_Connector.onSendingSucceed -= TimedEventSendingSucceed;
+			_Connector.onSendingFailed -= TimedEventSendingFailed;
+		}
+
+		#endregion
+
+		#region Event Processing
+
+		protected void ProcessEvents()
+		{
+			ProcessEventData();
+			ProcessTimedEventData();
+		}
+
+		protected void ProcessEventData()
+		{
+			EventDatum datum = _Recorder.CurrentEventDatum;
+
+			if (datum != null)
+			{
+				_Connector.onSendingSucceed += EventSendingFailed;
+				_Connector.onSendingFailed += EventSendingFailed;
+				
+				_Connector.SendData(datum.ToString());
+			}
+		}
+
+		protected void ProcessTimedEventData()
+		{
+			TimedEventDatum datum = _Recorder.FinishedTimedEvent;
+
+			if (datum != null)
+			{
+				_TempTimedEventDatum = datum;
+
+				_Connector.onSendingSucceed += TimedEventSendingSucceed;
+				_Connector.onSendingFailed += TimedEventSendingFailed;
+
+				_Connector.SendData(datum.ToString());
+			}
+		}
+
+		#endregion
 
 		#region Exposed API
 
+		public void SetDebugMode(bool debug)
+		{
+			DEBUG_ENABLED = debug;
+		}
+
 		public void SetApplicationVersion(string version)
 		{
-			_AppVersion = version;
+			_Connector.AppVersion = version;
 		}
 
 		public void EnableSecureConnection()
 		{
-			_UsingSecureChannel = true;
+			_Connector.UsingSecureChannel = true;
 		}
 
-		public void StartSession(string key)
+		public void StartSession()
 		{
-			_Key = key;
+			ProcessEvents();
 		}
 
 		public void Record(string eventName)
 		{
 			_Recorder.AddEvent(eventName);
+			ProcessEventData();
 		}
 
 		public void Record(string eventName, List<Parameter> parameters)
 		{
 			_Recorder.AddEvent(eventName, parameters);
+			ProcessEventData();
 		}
 		
 		public void Record(string eventName, bool isTimed)
@@ -89,6 +185,7 @@ namespace Reta
 		public void EndTimedRecord(string eventName)
 		{
 			_Recorder.EndTimedEvent(eventName);
+			ProcessTimedEventData();
 		}
 
 		#endregion
