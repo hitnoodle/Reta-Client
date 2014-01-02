@@ -25,7 +25,7 @@ namespace RetaClient
 		{
 			get 
 			{ 
-				if (_EventData.Count > 1)
+				if (_EventData.Count > 0)
 					return _EventData.Peek(); 
 				else 
 					return null;

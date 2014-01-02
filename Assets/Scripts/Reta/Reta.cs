@@ -59,6 +59,9 @@ namespace RetaClient
 			_Connector.onSendingSucceed -= EventSendingSucceed;
 			_Connector.onSendingFailed -= EventSendingFailed;
 
+			if (Reta.DEBUG_ENABLED) 
+				Debug.Log("[Reta] Sending event success: " + result);
+
 			//Check whether result is OK
 			_Recorder.DequeueEvent();
 
@@ -70,12 +73,18 @@ namespace RetaClient
 		{
 			_Connector.onSendingSucceed -= EventSendingSucceed;
 			_Connector.onSendingFailed -= EventSendingFailed;
+
+			if (Reta.DEBUG_ENABLED) 
+				Debug.Log("[Reta] Sending failed: " + error);
 		}
 
 		protected void TimedEventSendingSucceed(string result)
 		{
 			_Connector.onSendingSucceed -= TimedEventSendingSucceed;
 			_Connector.onSendingFailed -= TimedEventSendingFailed;
+
+			if (Reta.DEBUG_ENABLED) 
+				Debug.Log("[Reta] Sending timed event success: " + result);
 
 			//Check whether result is OK
 			_Recorder.DeleteTimedEvent(_TempTimedEventDatum);
@@ -88,6 +97,9 @@ namespace RetaClient
 		{
 			_Connector.onSendingSucceed -= TimedEventSendingSucceed;
 			_Connector.onSendingFailed -= TimedEventSendingFailed;
+
+			if (Reta.DEBUG_ENABLED) 
+				Debug.Log("[Reta] Sending timed event failed: " + error);
 		}
 
 		#endregion
@@ -102,7 +114,10 @@ namespace RetaClient
 			{
 				_Connector.onSendingSucceed += EventSendingSucceed;
 				_Connector.onSendingFailed += EventSendingFailed;
-				
+
+				if (Reta.DEBUG_ENABLED) 
+					Debug.Log("[Reta] Processing event datum " + datum.ToString());
+
 				_Connector.SendData(datum.ToString());
 			}
 		}
@@ -117,6 +132,9 @@ namespace RetaClient
 
 				_Connector.onSendingSucceed += TimedEventSendingSucceed;
 				_Connector.onSendingFailed += TimedEventSendingFailed;
+
+				if (Reta.DEBUG_ENABLED) 
+					Debug.Log("[Reta] Processing timed event datum " + datum.ToString());
 
 				_Connector.SendData(datum.ToString());
 			}

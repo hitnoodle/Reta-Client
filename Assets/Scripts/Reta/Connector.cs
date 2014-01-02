@@ -10,7 +10,7 @@ namespace RetaClient
 	public class Connector : MonoBehaviour
 	{
 		//Server url
-		protected const string _URL = "http://tokyotosho.info/search.php?terms=hatsune+miku&type=9";
+		protected const string _URL = "http://localhost:8080/connector";
 
 		protected string _ID;
 
@@ -46,6 +46,9 @@ namespace RetaClient
 			formData.AddField("appversion", _AppVersion);
 			formData.AddField("data", data);
 
+			if (Reta.DEBUG_ENABLED)
+				Debug.Log("[Reta] Sending Data " + data + " to " + _URL);
+
 			//Create URL
 			StartCoroutine(SendingData(formData));
 		}
@@ -53,7 +56,7 @@ namespace RetaClient
 		public IEnumerator SendingData(WWWForm data)
 		{
 			WWW web = new WWW(_URL, data);
-			
+
 			yield return web;
 
 			if (!string.IsNullOrEmpty(web.error))

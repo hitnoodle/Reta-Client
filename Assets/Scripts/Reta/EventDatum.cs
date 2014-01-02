@@ -79,12 +79,19 @@ namespace RetaClient
 		//JSON formatted string
 		public override string ToString()
 		{
-			List<string> paramStrings = new List<string>();
-			foreach(Parameter param in _Parameters) paramStrings.Add(param.ToString());
-
 			Dictionary<string, object> dict = new Dictionary<string, object>();
 			dict.Add("Name",_Name);
-			dict.Add("Parameter", paramStrings);
+
+			if (_Parameters != null) {
+				List<string> paramStrings = new List<string>();
+				foreach(Parameter param in _Parameters) {
+					if (param != null) 
+						paramStrings.Add(param.ToString());
+				}
+
+				dict.Add("Parameter", paramStrings);
+			}
+
 			dict.Add("Time", _Time.ToString()); //TODO: Check what time should be converted at
 
 			return Json.Serialize(dict);
@@ -128,12 +135,19 @@ namespace RetaClient
 		//JSON formatted string
 		public override string ToString()
 		{
-			List<string> paramStrings = new List<string>();
-			foreach(Parameter param in _Parameters) paramStrings.Add(param.ToString());
-			
 			Dictionary<string, object> dict = new Dictionary<string, object>();
 			dict.Add("Name",_Name);
-			dict.Add("Parameter", paramStrings);
+
+			if (_Parameters != null) {
+				List<string> paramStrings = new List<string>();
+				foreach(Parameter param in _Parameters) {
+					if (param != null) 
+						paramStrings.Add(param.ToString());
+				}
+
+				dict.Add("Parameter", paramStrings);
+			}
+
 			dict.Add("Time", _Time.ToString()); //TODO: Check what time should be converted at
 			dict.Add("Duration", _Duration);
 			

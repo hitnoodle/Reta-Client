@@ -12,11 +12,17 @@ public class MainSceneController : MonoBehaviour
 		Reta.Instance.SetDebugMode(true);
 
 		Reta.Instance.StartSession();
+
+		StartCoroutine(Test());
 	}
-	
-	// Update is called once per frame
-	void Update () 
-	{
-	
+
+	IEnumerator Test() {
+		yield return new WaitForSeconds(1);
+
+		Reta.Instance.Record("Game began.");
+
+		yield return new WaitForSeconds(1);
+
+		Reta.Instance.Record("Game ended.");
 	}
 }
