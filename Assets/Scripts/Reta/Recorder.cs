@@ -1,3 +1,4 @@
+using UnityEngine;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -102,7 +103,8 @@ namespace RetaClient
 
 		public void DequeueEvent()
 		{
-			_EventData.Dequeue();
+			if (_EventData.Count > 0)
+				_EventData.Dequeue();
 		}
 
 		public void DeleteTimedEvent(TimedEventDatum datum)

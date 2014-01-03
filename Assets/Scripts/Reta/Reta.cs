@@ -10,6 +10,8 @@ namespace RetaClient
 	 */
 	public class Reta 
 	{
+		protected const string DATA_SENT_SUCCESS = "DATA_SENT_SUCCESS";
+
 		public static bool DEBUG_ENABLED = false;
 
 		// Singleton for ease of access and managing resource
@@ -30,6 +32,7 @@ namespace RetaClient
 
 		//Object which represents the service
 		protected GameObject _GameObject;
+		protected RetaController _Controller;
 
 		//Components
 		protected Recorder _Recorder; 
@@ -37,7 +40,11 @@ namespace RetaClient
 
 		//Temp
 		TimedEventDatum _TempTimedEventDatum;
-		
+
+		//Log delegate
+		public delegate void OnDebugLog(string log);
+		public OnDebugLog onDebugLog = null;
+
 		//Hidden constructor
 		protected Reta() 
 		{
@@ -47,6 +54,8 @@ namespace RetaClient
 
 			//TODO: Check this shit, leak-prone
 			GameObject.DontDestroyOnLoad(_GameObject); 
+
+			_Controller = _GameObject.AddComponent<RetaController>();
 
 			_Recorder = new Recorder();
 			_Connector = _GameObject.AddComponent<Connector>();
@@ -59,14 +68,17 @@ namespace RetaClient
 			_Connector.onSendingSucceed -= EventSendingSucceed;
 			_Connector.onSendingFailed -= EventSendingFailed;
 
-			if (Reta.DEBUG_ENABLED) 
-				Debug.Log("[Reta] Sending event success: " + result);
+			if (DEBUG_ENABLED && onDebugLog != null) 
+				onDebugLog("[Reta] Sending event success: " + result);
 
 			//Check whether result is OK
-			_Recorder.DequeueEvent();
-
-			//Go again
-			ProcessEventData();
+			if (result == DATA_SENT_SUCCESS)
+			{
+				_Recorder.DequeueEvent();
+				
+				//Go again
+				ProcessEventData();
+			}
 		}
 
 		protected void EventSendingFailed(string error)
@@ -74,8 +86,8 @@ namespace RetaClient
 			_Connector.onSendingSucceed -= EventSendingSucceed;
 			_Connector.onSendingFailed -= EventSendingFailed;
 
-			if (Reta.DEBUG_ENABLED) 
-				Debug.Log("[Reta] Sending failed: " + error);
+			if (Reta.DEBUG_ENABLED && onDebugLog != null)
+				onDebugLog("[Reta] Sending failed: " + error);
 		}
 
 		protected void TimedEventSendingSucceed(string result)
@@ -83,14 +95,17 @@ namespace RetaClient
 			_Connector.onSendingSucceed -= TimedEventSendingSucceed;
 			_Connector.onSendingFailed -= TimedEventSendingFailed;
 
-			if (Reta.DEBUG_ENABLED) 
-				Debug.Log("[Reta] Sending timed event success: " + result);
+			if (DEBUG_ENABLED && onDebugLog != null)
+				onDebugLog("[Reta] Sending timed event success: " + result);
 
 			//Check whether result is OK
-			_Recorder.DeleteTimedEvent(_TempTimedEventDatum);
-			
-			//Go again
-			ProcessTimedEventData();
+			if (result == DATA_SENT_SUCCESS)
+			{
+				_Recorder.DeleteTimedEvent(_TempTimedEventDatum);
+				
+				//Go again
+				ProcessTimedEventData();
+			}
 		}
 
 		protected void TimedEventSendingFailed(string error)
@@ -98,13 +113,19 @@ namespace RetaClient
 			_Connector.onSendingSucceed -= TimedEventSendingSucceed;
 			_Connector.onSendingFailed -= TimedEventSendingFailed;
 
-			if (Reta.DEBUG_ENABLED) 
-				Debug.Log("[Reta] Sending timed event failed: " + error);
+			if (DEBUG_ENABLED && onDebugLog != null)
+				onDebugLog("[Reta] Sending timed event failed: " + error);
 		}
 
 		#endregion
 
 		#region Protected Event Processing
+
+		protected void ProcessEvents()
+		{
+			ProcessEventData();
+			ProcessTimedEventData();
+		}
 
 		protected void ProcessEventData()
 		{
@@ -115,8 +136,8 @@ namespace RetaClient
 				_Connector.onSendingSucceed += EventSendingSucceed;
 				_Connector.onSendingFailed += EventSendingFailed;
 
-				if (Reta.DEBUG_ENABLED) 
-					Debug.Log("[Reta] Processing event datum " + datum.ToString());
+				if (DEBUG_ENABLED && onDebugLog != null) 
+					onDebugLog("[Reta] Processing event datum " + datum.ToString());
 
 				_Connector.SendData(datum.ToString());
 			}
@@ -133,8 +154,8 @@ namespace RetaClient
 				_Connector.onSendingSucceed += TimedEventSendingSucceed;
 				_Connector.onSendingFailed += TimedEventSendingFailed;
 
-				if (Reta.DEBUG_ENABLED) 
-					Debug.Log("[Reta] Processing timed event datum " + datum.ToString());
+				if (DEBUG_ENABLED && onDebugLog != null) 
+					onDebugLog("[Reta] Processing timed event datum " + datum.ToString());
 
 				_Connector.SendData(datum.ToString());
 			}
@@ -154,20 +175,15 @@ namespace RetaClient
 			_Connector.AppVersion = version;
 		}
 
+		//default is unique device identifier
+		public void SetUserID(string id)
+		{
+			_Connector.ID = id;
+		}
+
 		public void EnableSecureConnection()
 		{
 			_Connector.UsingSecureChannel = true;
-		}
-
-		public void StartSession()
-		{
-			ProcessEvents();
-		}
-
-		public void ProcessEvents()
-		{
-			ProcessEventData();
-			ProcessTimedEventData();
 		}
 
 		public void Record(string eventName)

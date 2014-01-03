@@ -1,7 +1,6 @@
 using UnityEngine;
 using System.Collections;
 
-
 namespace RetaClient
 {
 	/* Modules for managing connection I.E: sending/receiving data 
@@ -12,7 +11,11 @@ namespace RetaClient
 		//Server url
 		protected const string _URL = "http://localhost:8080/connector";
 
-		protected string _ID;
+		protected string _ID = "";
+		public string ID
+		{
+			set { _ID = value; }
+		}
 
 		protected string _AppVersion = "UNDEFINED";
 		public string AppVersion
@@ -33,9 +36,10 @@ namespace RetaClient
 		public delegate void OnSendingFailed(string error);
 		public OnSendingFailed onSendingFailed = null;
 
-		protected void Start()
+		protected void Awake()
 		{
-			_ID = SystemInfo.deviceUniqueIdentifier;
+			if (_ID != "")
+				_ID = SystemInfo.deviceUniqueIdentifier;
 		}
 
 		//Data is sent using HTTP GET
@@ -46,8 +50,8 @@ namespace RetaClient
 			formData.AddField("appversion", _AppVersion);
 			formData.AddField("data", data);
 
-			if (Reta.DEBUG_ENABLED)
-				Debug.Log("[Reta] Sending Data " + data + " to " + _URL);
+			if (Reta.DEBUG_ENABLED && Reta.Instance.onDebugLog != null)
+				Reta.Instance.onDebugLog("[Reta] Sending Data " + data + " to " + _URL);
 
 			//Create URL
 			StartCoroutine(SendingData(formData));
