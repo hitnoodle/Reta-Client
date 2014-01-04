@@ -18,7 +18,8 @@ namespace RetaClient
 		protected string _Value;
 		public string Value 
 		{
-			get { return _Value; }
+			set { _Value = value; }
+			get { return _Value;  }
 		}
 		
 		public Parameter()
@@ -127,9 +128,37 @@ namespace RetaClient
 			_Duration = DateTime.Now - _Time;
 		}
 
-		public void EndEvent(DateTime endTime)
+		public void EndEvent(List<Parameter> parameters)
 		{
-			_Duration = endTime - _Time;
+			_Duration = DateTime.Now - _Time;
+
+			if (_Parameters != null)
+			{
+				int len = parameters.Count;
+				List<int> newparams = new List<int>();
+
+				//Update old parameter value
+				for (int i=0;i<len;i++)
+				{
+					bool found = false;
+					foreach(Parameter param in _Parameters)
+					{
+						if (param.Key == parameters[i].Key)
+						{
+							param.Value = parameters[i].Value;
+							found = true;
+
+							break;
+						}
+					}
+
+					if (!found) newparams.Add(i);
+				}
+
+				//Add new parameter
+				foreach(int i in newparams)
+					_Parameters.Add(parameters[i]);
+			}
 		}
 
 		//JSON formatted string

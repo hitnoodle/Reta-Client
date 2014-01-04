@@ -97,6 +97,23 @@ namespace RetaClient
 			return false;
 		}
 
+		public bool EndTimedEvent(string eventName, List<Parameter> parameters)
+		{
+			//Search for the record indicating event beginning
+			foreach(TimedEventDatum datum in _TimedEventData)
+			{
+				if (datum.Name == eventName)
+				{
+					//Update duration
+					datum.EndEvent(parameters);
+					
+					return true;
+				}
+			}
+			
+			return false;
+		}
+
 		#endregion
 
 		#region Delete

@@ -82,12 +82,16 @@ public class XmlManager: MonoBehaviour
 		string data = null;
 		string path = Application.persistentDataPath + "/" + filename;
 
-		StreamReader sr = File.OpenText(path);
-		if (sr != null) {
-			data = sr.ReadToEnd();
-
-			if (ENABLE_ENCRYPTION) 
-				data = Decrypt(data);
+		FileInfo t = new FileInfo(path);
+		if (t.Exists)
+		{
+			StreamReader sr = File.OpenText(path);
+			if (sr != null) {
+				data = sr.ReadToEnd();
+				
+				if (ENABLE_ENCRYPTION) 
+					data = Decrypt(data);
+			}
 		}
 		
 		return data;

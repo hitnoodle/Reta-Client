@@ -3,7 +3,7 @@ using System.Collections;
 
 public class User
 {
-	protected const int TUTORIAL_STEPS = 3;
+	public const int TUTORIAL_STEPS = 3;
 
 	public string Name;
 	public int Level;

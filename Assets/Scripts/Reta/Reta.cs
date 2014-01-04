@@ -222,6 +222,12 @@ namespace RetaClient
 			ProcessTimedEventData();
 		}
 
+		public void EndTimedRecord(string eventName, List<Parameter> parameters)
+		{
+			_Recorder.EndTimedEvent(eventName, parameters);
+			ProcessTimedEventData();
+		}
+
 		#endregion
 	}
 }
