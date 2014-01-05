@@ -37,10 +37,10 @@ public class MainSceneController : MonoBehaviour
 	{
 		Debug.Log(log);
 
+		_Logs.Enqueue(log);
+
 		if (_Logs.Count > LOG_LINES)
 			_Logs.Dequeue();
-
-		_Logs.Enqueue(log);
 	}
 
 	#region UI

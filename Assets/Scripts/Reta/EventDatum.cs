@@ -60,21 +60,21 @@ namespace RetaClient
 		{
 			_Name = "";
 			_Parameters = null;
-			_Time = DateTime.Now;
+			_Time = DateTime.Now.ToUniversalTime();
 		}
 
 		public EventDatum(string name)
 		{
 			_Name = name;
 			_Parameters = null;
-			_Time = DateTime.Now;
+			_Time = DateTime.Now.ToUniversalTime();
 		}
 
 		public EventDatum(string name, List<Parameter> parameters)
 		{
 			_Name = name;
 			_Parameters = parameters;
-			_Time = DateTime.Now;
+			_Time = DateTime.Now.ToUniversalTime();
 		}
 
 		//JSON formatted string
@@ -90,10 +90,10 @@ namespace RetaClient
 						paramStrings.Add(param.ToString());
 				}
 
-				dict.Add("Parameter", paramStrings);
+				dict.Add("Parameters", paramStrings);
 			}
 
-			dict.Add("Time", _Time.ToString()); //TODO: Check what time should be converted at
+			dict.Add("Time", _Time.ToString());
 
 			return Json.Serialize(dict);
 		}
@@ -125,12 +125,12 @@ namespace RetaClient
 
 		public void EndEvent()
 		{
-			_Duration = DateTime.Now - _Time;
+			_Duration = DateTime.Now.ToUniversalTime() - _Time;
 		}
 
 		public void EndEvent(List<Parameter> parameters)
 		{
-			_Duration = DateTime.Now - _Time;
+			_Duration = DateTime.Now.ToUniversalTime() - _Time;
 
 			if (_Parameters != null)
 			{
@@ -174,11 +174,13 @@ namespace RetaClient
 						paramStrings.Add(param.ToString());
 				}
 
-				dict.Add("Parameter", paramStrings);
+				dict.Add("Parameters", paramStrings);
 			}
 
-			dict.Add("Time", _Time.ToString()); //TODO: Check what time should be converted at
-			dict.Add("Duration", _Duration);
+			dict.Add("Time", _Time.ToString());
+
+			string ms = (int)_Duration.TotalMilliseconds + "ms";
+			dict.Add("Duration", ms);
 			
 			return Json.Serialize(dict);
 		}
