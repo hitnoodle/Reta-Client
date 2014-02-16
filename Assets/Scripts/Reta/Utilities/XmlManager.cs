@@ -60,6 +60,7 @@ public class XmlManager: MonoBehaviour
 
 		StreamWriter writer; 
 		FileInfo t = new FileInfo(path); 
+		//Debug.Log(xml);
 
 		if(!t.Exists) 
 		{ 
@@ -88,7 +89,8 @@ public class XmlManager: MonoBehaviour
 			StreamReader sr = File.OpenText(path);
 			if (sr != null) {
 				data = sr.ReadToEnd();
-				
+				//Debug.Log(data);
+
 				if (ENABLE_ENCRYPTION) 
 					data = Decrypt(data);
 			}

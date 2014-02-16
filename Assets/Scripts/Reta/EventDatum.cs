@@ -9,13 +9,13 @@ namespace RetaClient
 	/* Simple key value pair for holding parameter data */
 	public class Parameter 
 	{
-		protected string _Key;
+		public string _Key;
 		public string Key 
 		{
 			get { return _Key; } 
 		}
 		
-		protected string _Value;
+		public string _Value;
 		public string Value 
 		{
 			set { _Value = value; }
@@ -47,14 +47,14 @@ namespace RetaClient
 	/* Class for holding event datum */
 	public class EventDatum
 	{
-		protected string _Name;
+		public string _Name;
 		public string Name
 		{
 			get { return _Name; } 
 		}
 
-		protected List<Parameter> _Parameters;
-		protected DateTime _Time;
+		public List<Parameter> _Parameters;
+		public DateTime _Time;
 		
 		public EventDatum()
 		{
@@ -102,7 +102,7 @@ namespace RetaClient
 	/* Class for holding timed event datum */
 	public class TimedEventDatum : EventDatum
 	{
-		protected TimeSpan _Duration;
+		public TimeSpan _Duration;
 		public bool IsFinished 
 		{
 			get { return _Duration != TimeSpan.Zero; }

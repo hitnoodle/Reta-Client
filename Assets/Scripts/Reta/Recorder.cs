@@ -10,14 +10,28 @@ namespace RetaClient
 	 */
 	public class Recorder 
 	{
-		protected Queue<EventDatum> _EventData;
-		protected List<TimedEventDatum> _TimedEventData;
+		public List<EventDatum> _EventData;
+		public List<TimedEventDatum> _TimedEventData;
 
 		public Recorder() 
 		{
-			_EventData = new Queue<EventDatum>();
+			_EventData = new List<EventDatum>();
 			_TimedEventData = new List<TimedEventDatum>();
 		}
+
+		#region Serializer
+
+		void Save()
+		{
+			XmlManager.SaveInstanceAsXml("recorder", typeof(Recorder), this);
+		}
+
+		void Load()
+		{
+
+		}
+
+		#endregion
 
 		#region Getter
 
@@ -27,7 +41,7 @@ namespace RetaClient
 			get 
 			{ 
 				if (_EventData.Count > 0)
-					return _EventData.Peek(); 
+					return _EventData[0]; 
 				else 
 					return null;
 			}
@@ -55,25 +69,33 @@ namespace RetaClient
 		public void AddEvent(string eventName)
 		{
 			EventDatum datum = new EventDatum(eventName);
-			_EventData.Enqueue(datum);
+			_EventData.Add(datum);
+
+			Save();
 		}
 
 		public void AddEvent(string eventName, List<Parameter> parameters)
 		{
 			EventDatum datum = new EventDatum(eventName, parameters);
-			_EventData.Enqueue(datum);
+			_EventData.Add(datum);
+
+			Save();
 		}
 
 		public void AddTimedEvent(string eventName)
 		{
 			TimedEventDatum datum = new TimedEventDatum(eventName);
 			_TimedEventData.Add(datum);
+
+			Save();
 		}
 
 		public void AddTimedEvent(string eventName, List<Parameter> parameters)
 		{
 			TimedEventDatum datum = new TimedEventDatum(eventName, parameters);
 			_TimedEventData.Add(datum);
+
+			Save();
 		}
 
 		#endregion
@@ -89,6 +111,8 @@ namespace RetaClient
 				{
 					//Update duration
 					datum.EndEvent();
+
+					Save();
 
 					return true;
 				}
@@ -106,7 +130,9 @@ namespace RetaClient
 				{
 					//Update duration
 					datum.EndEvent(parameters);
-					
+
+					Save();
+
 					return true;
 				}
 			}
@@ -121,12 +147,16 @@ namespace RetaClient
 		public void DequeueEvent()
 		{
 			if (_EventData.Count > 0)
-				_EventData.Dequeue();
+			{
+				_EventData.RemoveAt(0);
+				Save();
+			}
 		}
 
 		public void DeleteTimedEvent(TimedEventDatum datum)
 		{
 			_TimedEventData.Remove(datum);
+			Save();
 		}
 
 		#endregion

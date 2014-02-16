@@ -45,6 +45,9 @@ namespace RetaClient
 		public delegate void OnDebugLog(string log);
 		public OnDebugLog onDebugLog = null;
 
+		//Disable when developing
+		protected bool _Disable = false;
+
 		//Hidden constructor
 		protected Reta() 
 		{
@@ -57,7 +60,12 @@ namespace RetaClient
 
 			_Controller = _GameObject.AddComponent<RetaController>();
 
-			_Recorder = new Recorder();
+			_Recorder = (Recorder)XmlManager.LoadInstanceAsXml("recorder", typeof(Recorder));
+			if (_Recorder == null) 
+				_Recorder = new Recorder();
+			else
+				ProcessEvents();
+
 			_Connector = _GameObject.AddComponent<Connector>();
 		}
 
@@ -170,6 +178,11 @@ namespace RetaClient
 			DEBUG_ENABLED = debug;
 		}
 
+		public void Disable()
+		{
+			_Disable = true;
+		}
+
 		public void SetApplicationVersion(string version)
 		{
 			_Connector.AppVersion = version;
@@ -188,18 +201,24 @@ namespace RetaClient
 
 		public void Record(string eventName)
 		{
+			if (_Disable) return;
+
 			_Recorder.AddEvent(eventName);
 			ProcessEventData();
 		}
 
 		public void Record(string eventName, List<Parameter> parameters)
 		{
+			if (_Disable) return;
+
 			_Recorder.AddEvent(eventName, parameters);
 			ProcessEventData();
 		}
 		
 		public void Record(string eventName, bool isTimed)
 		{
+			if (_Disable) return;
+
 			if (isTimed)
 			{
 				_Recorder.AddTimedEvent(eventName);
@@ -209,6 +228,8 @@ namespace RetaClient
 		
 		public void Record(string eventName, List<Parameter> parameters, bool isTimed)
 		{
+			if (_Disable) return;
+
 			if (isTimed)
 			{
 				_Recorder.AddTimedEvent(eventName, parameters);
@@ -218,12 +239,16 @@ namespace RetaClient
 
 		public void EndTimedRecord(string eventName)
 		{
+			if (_Disable) return;
+
 			_Recorder.EndTimedEvent(eventName);
 			ProcessTimedEventData();
 		}
 
 		public void EndTimedRecord(string eventName, List<Parameter> parameters)
 		{
+			if (_Disable) return;
+
 			_Recorder.EndTimedEvent(eventName, parameters);
 			ProcessTimedEventData();
 		}

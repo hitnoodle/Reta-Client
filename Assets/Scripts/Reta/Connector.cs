@@ -9,7 +9,9 @@ namespace RetaClient
 	public class Connector : MonoBehaviour
 	{
 		//Server url
-		protected const string _URL = "http://localhost:8080/connector";
+		//protected const string _URL = "http://localhost:8080/connector";
+		//protected const string _URL = "http://192.168.1.36:8080/connector";
+		protected const string _URL = "http://retaserver.appspot.com/connector";
 
 		protected string _ID = "";
 		public string ID
