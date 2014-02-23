@@ -10,7 +10,6 @@ namespace RetaClient
 	{
 		//Server url
 		//protected const string _URL = "http://localhost:8080/connector";
-		//protected const string _URL = "http://192.168.1.36:8080/connector";
 		protected const string _URL = "http://retaserver.appspot.com/connector";
 
 		protected string _ID = "";
@@ -40,7 +39,7 @@ namespace RetaClient
 
 		protected void Awake()
 		{
-			if (_ID != "")
+			if (_ID == "")
 				_ID = SystemInfo.deviceUniqueIdentifier;
 		}
 
@@ -53,7 +52,7 @@ namespace RetaClient
 			formData.AddField("data", data);
 
 			if (Reta.DEBUG_ENABLED && Reta.Instance.onDebugLog != null)
-				Reta.Instance.onDebugLog("[Reta] Sending Data " + data + " to " + _URL);
+				Reta.Instance.onDebugLog("[Reta] Sending Data " + data + " to " + _ID);
 
 			//Create URL
 			StartCoroutine(SendingData(formData));

@@ -66,6 +66,8 @@ namespace RetaClient
 			else
 				ProcessEvents();
 
+			//_Recorder = new Recorder();
+
 			_Connector = _GameObject.AddComponent<Connector>();
 		}
 
@@ -176,6 +178,7 @@ namespace RetaClient
 		public void SetDebugMode(bool debug)
 		{
 			DEBUG_ENABLED = debug;
+			onDebugLog += _Controller.DebugLog;
 		}
 
 		public void Disable()

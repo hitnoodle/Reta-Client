@@ -47,5 +47,10 @@ namespace RetaClient
 			isQuitting = true;
 			Application.Quit();
 		}
+
+		public void DebugLog(string log)
+		{
+			Debug.Log(log);
+		}
 	}
 }
